@@ -1,0 +1,29 @@
+CREATE DATABASE IF NOT EXISTS film_tracker;
+USE film_tracker;
+
+CREATE TABLE IF NOT EXISTS cameras (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  model VARCHAR(255) NOT NULL,
+  supported_film_type VARCHAR(50) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS film_types (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  iso INT NOT NULL,
+  format VARCHAR(50) NOT NULL,
+  expiration_date DATE NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS rolls (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  camera_id INT NOT NULL,
+  film_type_id INT NOT NULL,
+  load_date DATE NOT NULL,
+  end_date DATE DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_camera FOREIGN KEY (camera_id) REFERENCES cameras(id),
+  CONSTRAINT fk_film FOREIGN KEY (film_type_id) REFERENCES film_types(id)
+);
