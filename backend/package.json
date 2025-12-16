@@ -1,0 +1,14 @@
+{
+  "name": "film-roll-tracker-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Express backend for the film roll tracker app",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "mysql2": "^3.12.0"
+  }
+}
