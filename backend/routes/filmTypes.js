@@ -17,4 +17,16 @@ router.post("/", async (req, res) => {
   res.status(201).end();
 });
 
+router.delete("/:id", async (req, res) => {
+  const [[rollCheck]] = await db.query(
+    "SELECT id FROM rolls WHERE film_type_id = ? LIMIT 1",
+    [req.params.id]
+  );
+  if (rollCheck) {
+    return res.status(409).json({ error: "Cannot delete a film type that is used by rolls" });
+  }
+  await db.query("DELETE FROM film_types WHERE id = ?", [req.params.id]);
+  res.status(204).end();
+});
+
 export default router;

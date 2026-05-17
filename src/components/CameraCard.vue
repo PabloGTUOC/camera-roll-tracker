@@ -20,9 +20,11 @@ const props = defineProps({
 
 const emit = defineEmits<{
   finishRoll: [payload: { id: number; end_date: string }]
+  deleteCamera: [id: number]
 }>()
 
 const endDate = ref('')
+const confirmDelete = ref(false)
 
 const expirationLabel = computed(() => {
   if (!props.activeRoll) return ''
@@ -49,8 +51,27 @@ const submitFinish = () => {
         <p class="label">{{ camera.supported_film_type }}</p>
         <h3>{{ camera.model }}</h3>
       </div>
-      <div v-if="activeRoll" class="chip" :class="{ expired: expirationLabel === 'Expired film' }">
-        {{ expirationLabel }}
+      <div class="header-right">
+        <div v-if="activeRoll" class="chip" :class="{ expired: expirationLabel === 'Expired film' }">
+          {{ expirationLabel }}
+        </div>
+        <div class="delete-wrap">
+          <button
+            v-if="!confirmDelete"
+            class="delete-btn"
+            type="button"
+            :title="activeRoll ? 'Cannot delete: camera has an active roll' : 'Delete camera'"
+            :disabled="!!activeRoll"
+            @click="confirmDelete = true"
+          >
+            🗑
+          </button>
+          <div v-else class="confirm-inline">
+            <span class="confirm-text">Delete?</span>
+            <button class="confirm-yes" type="button" @click="emit('deleteCamera', camera.id)">Yes</button>
+            <button class="confirm-no" type="button" @click="confirmDelete = false">No</button>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -81,9 +102,16 @@ const submitFinish = () => {
 
 .card__header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 h3 {
@@ -152,5 +180,59 @@ button:disabled {
   background: #3b4865;
   color: #8896b7;
   cursor: not-allowed;
+}
+
+/* Delete controls */
+.delete-btn {
+  background: transparent;
+  color: #4e6088;
+  border: 1px solid #243150;
+  border-radius: 7px;
+  padding: 4px 7px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  align-self: auto;
+}
+
+.delete-btn:hover:not(:disabled) {
+  color: #ff7c8a;
+  border-color: #ff7c8a;
+}
+
+.delete-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: transparent;
+}
+
+.confirm-inline {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.confirm-text {
+  font-size: 12px;
+  color: #ff9faa;
+  font-weight: 600;
+}
+
+.confirm-yes {
+  background: #c0392b;
+  color: #fff;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  align-self: auto;
+}
+
+.confirm-no {
+  background: #243150;
+  color: #b5c4e8;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  align-self: auto;
 }
 </style>

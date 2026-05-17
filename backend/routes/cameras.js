@@ -17,4 +17,16 @@ router.post("/", async (req, res) => {
   res.status(201).end();
 });
 
+router.delete("/:id", async (req, res) => {
+  const [[rollCheck]] = await db.query(
+    "SELECT id FROM rolls WHERE camera_id = ? LIMIT 1",
+    [req.params.id]
+  );
+  if (rollCheck) {
+    return res.status(409).json({ error: "Cannot delete a camera that has rolls" });
+  }
+  await db.query("DELETE FROM cameras WHERE id = ?", [req.params.id]);
+  res.status(204).end();
+});
+
 export default router;
