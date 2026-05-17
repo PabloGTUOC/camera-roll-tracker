@@ -42,6 +42,9 @@ const submitFinish = () => {
   emit('finishRoll', { id: props.activeRoll.id, end_date: endDate.value })
   endDate.value = ''
 }
+
+const fmt = (d: string) =>
+  new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
 </script>
 
 <template>
@@ -75,8 +78,8 @@ const submitFinish = () => {
     </header>
 
     <p class="roll">{{ rollDescription }}</p>
-    <p v-if="activeRoll" class="meta">Loaded on {{ activeRoll.load_date }}</p>
-    <p v-if="activeRoll" class="meta">Expires on {{ activeRoll.expiration_date }}</p>
+    <p v-if="activeRoll" class="meta">Loaded on {{ fmt(activeRoll.load_date) }}</p>
+    <p v-if="activeRoll" class="meta">Expires on {{ fmt(activeRoll.expiration_date) }}</p>
     <p v-else class="meta">Waiting for the next roll.</p>
 
     <div v-if="activeRoll" class="finish">
