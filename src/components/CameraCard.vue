@@ -64,10 +64,9 @@ const submitFinish = () => {
             :disabled="!!activeRoll"
             @click="confirmDelete = true"
           >
-            🗑
+            ✕
           </button>
           <div v-else class="confirm-inline">
-            <span class="confirm-text">Delete?</span>
             <button class="confirm-yes" type="button" @click="emit('deleteCamera', camera.id)">Yes</button>
             <button class="confirm-no" type="button" @click="confirmDelete = false">No</button>
           </div>
@@ -81,23 +80,23 @@ const submitFinish = () => {
     <p v-else class="meta">Waiting for the next roll.</p>
 
     <div v-if="activeRoll" class="finish">
-      <label class="meta" for="end-date">End date</label>
+      <label class="finish-label" for="end-date">End date</label>
       <input id="end-date" v-model="endDate" type="date" />
-      <button :disabled="!endDate" type="button" @click="submitFinish">Finish roll</button>
+      <button :disabled="!endDate" type="button" class="finish-btn" @click="submitFinish">Finish roll</button>
     </div>
   </article>
 </template>
 
 <style scoped>
 .card {
-  background: #111c33;
-  border: 1px solid #1e2c4c;
+  background: #fff;
+  border: 2px solid #111;
   border-radius: 12px;
-  padding: 16px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  box-shadow: 0 18px 48px rgba(5, 11, 28, 0.6);
+  box-shadow: 4px 4px 0 #111;
 }
 
 .card__header {
@@ -105,6 +104,7 @@ const submitFinish = () => {
   align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
+  margin-bottom: 4px;
 }
 
 .header-right {
@@ -114,125 +114,160 @@ const submitFinish = () => {
   flex-shrink: 0;
 }
 
-h3 {
-  margin: 6px 0 0;
-  color: #f2f6ff;
-}
-
 .label {
   margin: 0;
-  color: #8ea6e8;
-  font-size: 12px;
-  letter-spacing: 0.08em;
+  color: #666;
+  font-size: 11px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  font-weight: 700;
+}
+
+h3 {
+  margin: 4px 0 0;
+  color: #111;
+  font-size: 20px;
+  font-weight: 800;
 }
 
 .roll {
-  margin: 8px 0 0;
-  font-weight: 600;
+  margin: 4px 0 0;
+  font-weight: 700;
+  font-size: 15px;
+  color: #111;
 }
 
 .meta {
-  color: #b5c4e8;
-  margin: 2px 0;
+  color: #555;
+  margin: 1px 0;
+  font-size: 14px;
 }
 
+/* Badge */
 .chip {
-  background: #1f3055;
-  color: #cfe0ff;
-  padding: 6px 10px;
+  border: 2px solid #111;
+  color: #111;
+  background: #fff;
+  padding: 4px 10px;
   border-radius: 20px;
-  font-size: 13px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .chip.expired {
-  background: #ffe0e6;
-  color: #481420;
+  border-color: #c0392b;
+  color: #c0392b;
 }
 
+/* Finish roll */
 .finish {
-  margin-top: 10px;
+  margin-top: 12px;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 12px;
+}
+
+.finish-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #555;
 }
 
 input[type='date'] {
-  background: #0b1324;
-  color: #f2f6ff;
-  border: 1px solid #2b3a5b;
+  background: #f5f5f3;
+  color: #111;
+  border: 2px solid #111;
   border-radius: 8px;
   padding: 8px 10px;
+  font-size: 14px;
+  font-weight: 600;
 }
 
-button {
+.finish-btn {
   align-self: flex-start;
-  background: #6c8dff;
-  color: #0b1324;
-  border: none;
+  background: #111;
+  color: #fff;
+  border: 2px solid #111;
   border-radius: 8px;
-  padding: 8px 12px;
-  font-weight: 700;
+  padding: 8px 14px;
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   cursor: pointer;
+  box-shadow: 3px 3px 0 #111;
+  transition: transform 0.1s, box-shadow 0.1s;
 }
 
-button:disabled {
-  background: #3b4865;
-  color: #8896b7;
+.finish-btn:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 #111;
+}
+
+.finish-btn:disabled {
+  background: #ccc;
+  border-color: #ccc;
+  color: #888;
+  box-shadow: none;
   cursor: not-allowed;
 }
 
-/* Delete controls */
+/* Delete */
 .delete-btn {
   background: transparent;
-  color: #4e6088;
-  border: 1px solid #243150;
-  border-radius: 7px;
-  padding: 4px 7px;
-  font-size: 14px;
+  color: #bbb;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  width: 26px;
+  height: 26px;
+  font-size: 12px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: color 0.15s, border-color 0.15s;
-  align-self: auto;
 }
 
 .delete-btn:hover:not(:disabled) {
-  color: #ff7c8a;
-  border-color: #ff7c8a;
+  color: #c0392b;
+  border-color: #c0392b;
 }
 
 .delete-btn:disabled {
-  opacity: 0.3;
+  opacity: 0.25;
   cursor: not-allowed;
-  background: transparent;
 }
 
 .confirm-inline {
   display: flex;
-  align-items: center;
-  gap: 5px;
+  gap: 4px;
 }
 
-.confirm-text {
-  font-size: 12px;
-  color: #ff9faa;
-  font-weight: 600;
+.confirm-yes, .confirm-no {
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 2px solid #111;
+  box-shadow: 2px 2px 0 #111;
 }
 
 .confirm-yes {
   background: #c0392b;
   color: #fff;
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 12px;
-  align-self: auto;
+  border-color: #c0392b;
+  box-shadow: 2px 2px 0 #7a1a11;
 }
 
 .confirm-no {
-  background: #243150;
-  color: #b5c4e8;
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 12px;
-  align-self: auto;
+  background: #fff;
+  color: #111;
 }
 </style>

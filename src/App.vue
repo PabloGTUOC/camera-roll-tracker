@@ -20,7 +20,6 @@ type DevelopmentRoll = {
   lab_name: string | null; sent_to_lab_date: string | null; scanned_at: string | null
 }
 type HistoryRoll = DevelopmentRoll & { scanned_at: string }
-
 type Tab = 'cameras' | 'development' | 'history'
 
 const apiBase = 'http://localhost:3000'
@@ -149,33 +148,22 @@ onMounted(refreshData)
         <p class="subtitle">Manage cameras, film types, and active rolls.</p>
       </div>
       <div class="actions">
-        <button type="button" class="primary" @click="showCameraModal = true">New Camera</button>
-        <button type="button" class="primary" @click="showFilmTypeModal = true">New Film Type</button>
-        <button type="button" class="primary" @click="showLoadRollModal = true">Load Roll</button>
+        <button type="button" class="btn" :class="{ active: currentTab === 'development' }" @click="currentTab = 'development'">
+          Development
+          <span v-if="developmentRolls.length" class="count">{{ developmentRolls.length }}</span>
+        </button>
+        <button type="button" class="btn" :class="{ active: currentTab === 'history' }" @click="currentTab = 'history'">
+          History
+          <span v-if="historyRolls.length" class="count">{{ historyRolls.length }}</span>
+        </button>
+        <button type="button" class="btn" :class="{ active: currentTab === 'cameras' }" @click="currentTab = 'cameras'">
+          Cameras
+        </button>
+        <button type="button" class="btn" @click="showCameraModal = true">New Camera</button>
+        <button type="button" class="btn" @click="showFilmTypeModal = true">New Film Type</button>
+        <button type="button" class="btn" @click="showLoadRollModal = true">Load Roll</button>
       </div>
     </header>
-
-    <!-- Tab bar -->
-    <nav class="tabs">
-      <button
-        v-for="tab in (['cameras', 'development', 'history'] as Tab[])"
-        :key="tab"
-        class="tab"
-        :class="{ active: currentTab === tab }"
-        type="button"
-        @click="currentTab = tab"
-      >
-        <span v-if="tab === 'cameras'">📷 Cameras
-          <span v-if="activeRolls.length" class="badge">{{ activeRolls.length }}</span>
-        </span>
-        <span v-else-if="tab === 'development'">🧪 Development
-          <span v-if="developmentRolls.length" class="badge">{{ developmentRolls.length }}</span>
-        </span>
-        <span v-else>🗂 History
-          <span v-if="historyRolls.length" class="badge muted">{{ historyRolls.length }}</span>
-        </span>
-      </button>
-    </nav>
 
     <section v-if="errorMessage" class="banner error">{{ errorMessage }}</section>
     <section v-if="isLoading" class="banner muted">Loading data...</section>
@@ -194,7 +182,7 @@ onMounted(refreshData)
       </section>
       <section v-else class="empty">No cameras created yet.</section>
 
-      <!-- Film types inventory -->
+      <!-- Film type inventory -->
       <section class="inventory">
         <h2 class="inventory-title">Film Type Inventory</h2>
         <div v-if="filmTypes.length" class="film-list">
@@ -205,12 +193,12 @@ onMounted(refreshData)
             </div>
             <div class="film-row__actions">
               <template v-if="filmTypeDeleteConfirm !== ft.id">
-                <button class="delete-btn" type="button" @click="filmTypeDeleteConfirm = ft.id">🗑</button>
+                <button class="btn btn-sm btn-ghost" type="button" @click="filmTypeDeleteConfirm = ft.id">Delete</button>
               </template>
               <template v-else>
-                <span class="confirm-text">Delete?</span>
-                <button class="confirm-yes" type="button" @click="deleteFilmType(ft.id)">Yes</button>
-                <button class="confirm-no" type="button" @click="filmTypeDeleteConfirm = null">No</button>
+                <span class="confirm-text">Are you sure?</span>
+                <button class="btn btn-sm btn-danger" type="button" @click="deleteFilmType(ft.id)">Yes, delete</button>
+                <button class="btn btn-sm btn-ghost" type="button" @click="filmTypeDeleteConfirm = null">Cancel</button>
               </template>
             </div>
           </div>
@@ -252,17 +240,19 @@ onMounted(refreshData)
 </template>
 
 <style scoped>
+:global(*) { box-sizing: border-box; }
+
 :global(body) {
   margin: 0;
-  background: #0b1324;
-  color: #f2f6ff;
+  background: #f0efeb;
+  color: #111;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 .page {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 32px 20px 48px;
+  padding: 32px 20px 64px;
 }
 
 .header {
@@ -270,143 +260,167 @@ onMounted(refreshData)
   justify-content: space-between;
   gap: 16px;
   align-items: flex-start;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
 }
 
 .eyebrow {
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   font-size: 12px;
-  color: #9fb4ff;
+  font-weight: 700;
+  color: #111;
   margin: 0 0 4px;
 }
 
-h1 { margin: 0; }
-
-.subtitle { color: #c7d4ff; margin: 6px 0 0; }
-
-.actions { display: flex; gap: 10px; }
-
-button { border: none; border-radius: 8px; padding: 10px 14px; cursor: pointer; font-weight: 600; }
-
-.primary { background: linear-gradient(120deg, #6c8dff, #92b5ff); color: #0b1324; }
-
-/* Tabs */
-.tabs {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #1a2a46;
-  padding-bottom: 0;
+h1 {
+  margin: 0;
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  color: #111;
 }
 
-.tab {
-  background: transparent;
-  color: #6b7fa8;
-  border-radius: 8px 8px 0 0;
-  padding: 10px 18px;
+.subtitle {
+  color: #555;
+  margin: 6px 0 0;
   font-size: 14px;
-  font-weight: 600;
-  border: 1px solid transparent;
-  border-bottom: none;
-  transition: color 0.15s, background 0.15s;
-  position: relative;
-  bottom: -1px;
 }
 
-.tab.active {
-  color: #f2f6ff;
-  background: #111c33;
-  border-color: #1a2a46;
-  border-bottom-color: #111c33;
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  padding-top: 4px;
 }
 
-.tab:hover:not(.active) { color: #c7d4ff; }
+/* Base button */
+.btn {
+  background: #111;
+  color: #fff;
+  border: 2px solid #111;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 3px 3px 0 #111;
+  transition: transform 0.1s, box-shadow 0.1s;
+  white-space: nowrap;
+}
 
-.badge {
+.btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 #111;
+}
+
+.btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 #111;
+}
+
+.btn.active {
+  background: #fff;
+  color: #111;
+}
+
+.btn-sm {
+  padding: 6px 10px;
+  font-size: 11px;
+}
+
+.btn-ghost {
+  background: #fff;
+  color: #111;
+  box-shadow: 2px 2px 0 #111;
+}
+
+.btn-danger {
+  background: #c0392b;
+  color: #fff;
+  border-color: #c0392b;
+  box-shadow: 2px 2px 0 #7a1a11;
+}
+
+.count {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #6c8dff;
-  color: #0b1324;
+  background: #fff;
+  color: #111;
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 900;
   border-radius: 10px;
   padding: 1px 6px;
   margin-left: 6px;
-  vertical-align: middle;
 }
 
-.badge.muted { background: #2a3a5e; color: #8ca0cc; }
+.btn.active .count {
+  background: #111;
+  color: #fff;
+}
 
 /* Banners */
-.banner { padding: 12px 14px; border-radius: 10px; margin-bottom: 16px; }
-.banner.error { background: #ffb3c0; color: #420510; }
-.banner.muted { background: #1c2742; color: #dbe6ff; }
+.banner {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border: 2px solid #111;
+  font-weight: 600;
+}
+
+.banner.error { background: #ffe0e0; color: #7a1a1a; }
+.banner.muted { background: #fff; color: #555; }
 
 /* Cards grid */
-.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
 
-.empty { text-align: center; color: #a8b7d9; padding: 40px 0; }
+.empty {
+  text-align: center;
+  color: #777;
+  padding: 48px 0;
+  font-size: 15px;
+}
 
 /* Film type inventory */
-.inventory { margin-top: 32px; }
+.inventory { margin-top: 40px; }
 
 .inventory-title {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.07em;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #6c8dff;
+  color: #111;
   margin: 0 0 12px;
 }
 
-.film-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+.film-list { display: flex; flex-direction: column; gap: 8px; }
 
 .film-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #111c33;
-  border: 1px solid #1e2c4c;
+  background: #fff;
+  border: 2px solid #111;
   border-radius: 10px;
-  padding: 10px 14px;
+  padding: 12px 16px;
   gap: 12px;
+  box-shadow: 3px 3px 0 #111;
 }
 
 .film-row__info { display: flex; flex-direction: column; gap: 2px; }
-.film-row__name { font-weight: 600; font-size: 14px; }
-.film-row__meta { font-size: 12px; color: #7a90bc; }
+.film-row__name { font-weight: 700; font-size: 14px; }
+.film-row__meta { font-size: 12px; color: #666; }
+.film-row__actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
-.film-row__actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-
-.delete-btn {
-  background: transparent;
-  color: #4e6088;
-  border: 1px solid #243150;
-  border-radius: 7px;
-  padding: 4px 8px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
-}
-.delete-btn:hover { color: #ff7c8a; border-color: #ff7c8a; }
-
-.confirm-text { font-size: 12px; color: #ff9faa; font-weight: 600; }
-
-.confirm-yes {
-  background: #c0392b; color: #fff;
-  border-radius: 6px; padding: 4px 8px; font-size: 12px;
-}
-
-.confirm-no {
-  background: #243150; color: #b5c4e8;
-  border-radius: 6px; padding: 4px 8px; font-size: 12px;
-}
-
-.empty-small { color: #5a6e94; font-size: 13px; margin: 0; }
+.confirm-text { font-size: 12px; font-weight: 700; color: #c0392b; }
+.empty-small { color: #888; font-size: 13px; margin: 0; }
 </style>

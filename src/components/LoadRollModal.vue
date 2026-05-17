@@ -44,9 +44,7 @@ const hasActiveRoll = computed(() => {
   return props.activeRollMap.has(selectedCamera.value.id)
 })
 
-watch(selectedCamera, () => {
-  filmTypeId.value = null
-})
+watch(selectedCamera, () => { filmTypeId.value = null })
 
 const submit = () => {
   if (!cameraId.value || !filmTypeId.value || !loadDate.value || hasActiveRoll.value) return
@@ -59,10 +57,10 @@ const submit = () => {
     <div class="modal">
       <header>
         <h2>Load Roll</h2>
-        <button class="ghost" type="button" @click="emit('close')">Close</button>
+        <button class="close-btn" type="button" @click="emit('close')">✕</button>
       </header>
       <form class="form" @submit.prevent="submit">
-        <label>
+        <label class="field-label">
           Camera
           <select v-model.number="cameraId">
             <option :value="null" disabled>Select camera</option>
@@ -72,7 +70,7 @@ const submit = () => {
           </select>
         </label>
 
-        <label>
+        <label class="field-label">
           Film type
           <select v-model.number="filmTypeId" :disabled="!selectedCamera">
             <option :value="null" disabled>Select film type</option>
@@ -85,15 +83,15 @@ const submit = () => {
           </small>
         </label>
 
-        <label>
+        <label class="field-label">
           Load date
           <input v-model="loadDate" type="date" />
         </label>
 
-        <p v-if="isExpired" class="expired">This film is expired but can still be loaded.</p>
-        <p v-if="hasActiveRoll" class="warning">This camera already has an active roll.</p>
+        <p v-if="isExpired" class="notice expired">This film is expired but can still be loaded.</p>
+        <p v-if="hasActiveRoll" class="notice warning">This camera already has an active roll.</p>
 
-        <button class="primary" type="submit" :disabled="!cameraId || !filmTypeId || !loadDate || hasActiveRoll">
+        <button class="submit-btn" type="submit" :disabled="!cameraId || !filmTypeId || !loadDate || hasActiveRoll">
           Load into camera
         </button>
       </form>
@@ -105,7 +103,7 @@ const submit = () => {
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(5, 8, 17, 0.7);
+  background: rgba(0, 0, 0, 0.4);
   display: grid;
   place-items: center;
   padding: 18px;
@@ -113,84 +111,109 @@ const submit = () => {
 }
 
 .modal {
-  background: #0f1a30;
-  border: 1px solid #203459;
+  background: #fff;
+  border: 2px solid #111;
   border-radius: 12px;
-  padding: 18px;
+  padding: 24px;
   width: min(520px, 100%);
-  color: #f4f7ff;
+  box-shadow: 6px 6px 0 #111;
 }
 
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
-.form {
+h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+
+.close-btn {
+  background: transparent;
+  border: 1.5px solid #ccc;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #666;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  align-items: center;
+  justify-content: center;
 }
 
-label {
+.close-btn:hover { border-color: #111; color: #111; }
+
+.form { display: flex; flex-direction: column; gap: 14px; }
+
+.field-label {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #555;
+}
+
+select, input {
+  background: #f5f5f3;
+  border: 2px solid #111;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #111;
+  font-size: 14px;
   font-weight: 600;
 }
 
-select,
-input {
-  background: #0b1324;
-  border: 1px solid #2a3958;
-  border-radius: 10px;
+select:disabled { opacity: 0.5; }
+
+.hint { color: #888; font-size: 11px; margin: 0; }
+
+.notice {
+  border: 2px solid #111;
+  border-radius: 8px;
   padding: 10px 12px;
-  color: #f2f6ff;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
 }
 
-button {
-  border: none;
-  border-radius: 10px;
-  padding: 10px 12px;
+.notice.expired { background: #fff7e0; color: #7a4f00; border-color: #d4a017; }
+.notice.warning { background: #fff0f0; color: #7a1a1a; border-color: #c0392b; }
+
+.submit-btn {
+  background: #111;
+  color: #fff;
+  border: 2px solid #111;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   cursor: pointer;
-  font-weight: 700;
+  box-shadow: 3px 3px 0 #111;
+  transition: transform 0.1s, box-shadow 0.1s;
 }
 
-button.primary {
-  background: #6c8dff;
-  color: #0b1324;
+.submit-btn:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 #111;
 }
 
-button.ghost {
-  background: transparent;
-  color: #d5e2ff;
-}
-
-button:disabled {
-  background: #2e3c59;
-  color: #94a2c5;
+.submit-btn:disabled {
+  background: #ccc;
+  border-color: #ccc;
+  color: #888;
+  box-shadow: none;
   cursor: not-allowed;
-}
-
-.expired {
-  background: #ffe0e6;
-  color: #481420;
-  padding: 8px 10px;
-  border-radius: 10px;
-  margin: 0;
-}
-
-.warning {
-  background: #f6dcae;
-  color: #2e1d07;
-  padding: 8px 10px;
-  border-radius: 10px;
-  margin: 0;
-}
-
-.hint {
-  color: #b5c4e8;
 }
 </style>

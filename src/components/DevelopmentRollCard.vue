@@ -48,7 +48,7 @@ const submitMarkScanned = () => {
 <template>
   <article class="card">
     <header class="card__header">
-      <div class="card__meta">
+      <div>
         <p class="label">{{ roll.format }}</p>
         <h3>{{ roll.model }}</h3>
         <p class="film">{{ roll.film_name }} · ISO {{ roll.iso }}</p>
@@ -64,23 +64,18 @@ const submitMarkScanned = () => {
       <span>Finished {{ roll.end_date }}</span>
     </div>
 
-    <!-- Phase 1: not yet sent to lab -->
+    <!-- Phase 1: send to lab -->
     <div v-if="!isAtLab" class="section">
       <p class="section-title">Send to Lab</p>
-      <label>
+      <label class="field-label">
         Lab name
         <input v-model="labName" type="text" placeholder="e.g. Carmencita Lab" />
       </label>
-      <label>
+      <label class="field-label">
         Date sent
         <input v-model="sentDate" type="date" />
       </label>
-      <button
-        class="action-btn"
-        type="button"
-        :disabled="!labName || !sentDate"
-        @click="submitSendToLab"
-      >
+      <button class="action-btn" type="button" :disabled="!labName || !sentDate" @click="submitSendToLab">
         Send to Lab
       </button>
     </div>
@@ -89,19 +84,14 @@ const submitMarkScanned = () => {
     <div v-else class="section">
       <p class="section-title">At the Lab</p>
       <div class="lab-info">
-        <span class="lab-name">🧪 {{ roll.lab_name }}</span>
+        <span class="lab-name">{{ roll.lab_name }}</span>
         <span class="lab-date">Sent {{ roll.sent_to_lab_date }}</span>
       </div>
-      <label>
+      <label class="field-label">
         Scanned / received date
         <input v-model="scannedDate" type="date" />
       </label>
-      <button
-        class="action-btn done"
-        type="button"
-        :disabled="!scannedDate"
-        @click="submitMarkScanned"
-      >
+      <button class="action-btn done" type="button" :disabled="!scannedDate" @click="submitMarkScanned">
         ✓ Mark as Scanned
       </button>
     </div>
@@ -110,14 +100,14 @@ const submitMarkScanned = () => {
 
 <style scoped>
 .card {
-  background: #111c33;
-  border: 1px solid #1e2c4c;
+  background: #fff;
+  border: 2px solid #111;
   border-radius: 12px;
-  padding: 16px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  box-shadow: 0 18px 48px rgba(5, 11, 28, 0.6);
+  gap: 10px;
+  box-shadow: 4px 4px 0 #111;
 }
 
 .card__header {
@@ -129,58 +119,59 @@ const submitMarkScanned = () => {
 
 .label {
   margin: 0;
-  color: #8ea6e8;
-  font-size: 12px;
-  letter-spacing: 0.08em;
+  color: #666;
+  font-size: 11px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  font-weight: 700;
 }
 
 h3 {
   margin: 4px 0 2px;
-  color: #f2f6ff;
-  font-size: 16px;
+  color: #111;
+  font-size: 20px;
+  font-weight: 800;
 }
 
 .film {
   margin: 0;
-  color: #b5c4e8;
-  font-size: 13px;
+  color: #555;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .badge {
   flex-shrink: 0;
-  padding: 4px 10px;
+  border: 2px solid #111;
   border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.badge.awaiting {
-  background: #2a3a5e;
-  color: #9fb8f0;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #fff;
+  color: #111;
 }
 
 .badge.at-lab {
-  background: #1e3b2f;
-  color: #6edc9e;
+  border-color: #1a7a44;
+  color: #1a7a44;
 }
 
 .dates {
-  color: #8094bb;
+  color: #888;
   font-size: 12px;
   display: flex;
   gap: 6px;
 }
 
-.sep {
-  opacity: 0.4;
-}
+.sep { opacity: 0.4; }
 
 .section {
-  background: #0c1628;
-  border: 1px solid #1e2c4c;
+  background: #f5f5f3;
+  border: 2px solid #111;
   border-radius: 10px;
-  padding: 12px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -188,51 +179,66 @@ h3 {
 
 .section-title {
   margin: 0;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #6c8dff;
+  color: #111;
 }
 
-label {
+.field-label {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #c7d4ff;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #555;
 }
 
 input {
-  background: #0b1324;
-  border: 1px solid #2a3958;
+  background: #fff;
+  border: 2px solid #111;
   border-radius: 8px;
   padding: 8px 10px;
-  color: #f2f6ff;
+  color: #111;
   font-size: 14px;
+  font-weight: 600;
 }
 
 .action-btn {
   align-self: flex-start;
-  background: #6c8dff;
-  color: #0b1324;
-  border: none;
+  background: #111;
+  color: #fff;
+  border: 2px solid #111;
   border-radius: 8px;
   padding: 8px 14px;
-  font-weight: 700;
-  font-size: 13px;
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   cursor: pointer;
-  transition: opacity 0.15s;
+  box-shadow: 3px 3px 0 #111;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.action-btn:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 #111;
 }
 
 .action-btn.done {
-  background: #3ecf78;
+  background: #1a7a44;
+  border-color: #1a7a44;
+  box-shadow: 3px 3px 0 #0d4226;
 }
 
 .action-btn:disabled {
-  background: #2e3c59;
-  color: #7a8cb0;
+  background: #ccc;
+  border-color: #ccc;
+  color: #888;
+  box-shadow: none;
   cursor: not-allowed;
 }
 
@@ -242,13 +248,6 @@ input {
   gap: 2px;
 }
 
-.lab-name {
-  font-weight: 600;
-  color: #f2f6ff;
-}
-
-.lab-date {
-  font-size: 12px;
-  color: #8094bb;
-}
+.lab-name { font-weight: 700; font-size: 15px; color: #111; }
+.lab-date { font-size: 12px; color: #777; }
 </style>
