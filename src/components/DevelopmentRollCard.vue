@@ -34,6 +34,9 @@ const scannedDate = ref(new Date().toISOString().slice(0, 10))
 
 const isAtLab = computed(() => !!props.roll.lab_name && !!props.roll.sent_to_lab_date)
 
+const fmt = (d: string) =>
+  new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+
 const submitSendToLab = () => {
   if (!labName.value || !sentDate.value) return
   emit('sendToLab', { id: props.roll.id, lab_name: labName.value, sent_to_lab_date: sentDate.value })
@@ -59,9 +62,9 @@ const submitMarkScanned = () => {
     </header>
 
     <div class="dates">
-      <span>Loaded {{ roll.load_date }}</span>
+      <span>Loaded {{ fmt(roll.load_date) }}</span>
       <span class="sep">·</span>
-      <span>Finished {{ roll.end_date }}</span>
+      <span>Finished {{ fmt(roll.end_date) }}</span>
     </div>
 
     <!-- Phase 1: send to lab -->
@@ -85,7 +88,7 @@ const submitMarkScanned = () => {
       <p class="section-title">At the Lab</p>
       <div class="lab-info">
         <span class="lab-name">{{ roll.lab_name }}</span>
-        <span class="lab-date">Sent {{ roll.sent_to_lab_date }}</span>
+        <span class="lab-date">Sent {{ fmt(roll.sent_to_lab_date!) }}</span>
       </div>
       <label class="field-label">
         Scanned / received date

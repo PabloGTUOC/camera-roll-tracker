@@ -22,7 +22,7 @@ type DevelopmentRoll = {
 type HistoryRoll = DevelopmentRoll & { scanned_at: string }
 type Tab = 'cameras' | 'development' | 'history'
 
-const apiBase = 'http://localhost:3000'
+const apiBase = '/api'
 const currentTab = ref<Tab>('cameras')
 
 const cameras = ref<Camera[]>([])
