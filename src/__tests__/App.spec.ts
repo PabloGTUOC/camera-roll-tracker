@@ -12,11 +12,11 @@ describe('App', () => {
     const responses = [
       [
         { id: 1, model: 'Pentax K1000', supported_film_type: '35mm' },
-        { id: 2, model: 'Hasselblad 500', supported_film_type: '120' },
+        { id: 2, model: 'Hasselblad 500', supported_film_type: '120mm' },
       ],
       [
-        { id: 10, name: 'Portra 400', iso: 400, format: '35mm', expiration_date: '2030-01-01' },
-        { id: 11, name: 'HP5', iso: 400, format: '120', expiration_date: '2030-01-01' },
+        { id: 10, name: 'Portra 400', iso: 400, format: '35mm', expiration_date: '2030-01-01', quantity: 5 },
+        { id: 11, name: 'HP5', iso: 400, format: '120mm', expiration_date: '2030-01-01', quantity: 2 },
       ],
       [
         {
@@ -31,6 +31,8 @@ describe('App', () => {
           expiration_date: '2030-01-01',
         },
       ],
+      [], // developmentRolls mock response
+      [], // historyRolls mock response
     ]
 
     vi.stubGlobal(

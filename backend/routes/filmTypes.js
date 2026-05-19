@@ -9,12 +9,21 @@ router.get("/", async (_req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const { name, iso, format, expiration_date } = req.body;
+  const { name, iso, format, expiration_date, quantity } = req.body;
   await db.query(
-    "INSERT INTO film_types (name, iso, format, expiration_date) VALUES (?, ?, ?, ?)",
-    [name, iso, format, expiration_date]
+    "INSERT INTO film_types (name, iso, format, expiration_date, quantity) VALUES (?, ?, ?, ?, ?)",
+    [name, iso, format, expiration_date, quantity ?? 0]
   );
   res.status(201).end();
+});
+
+router.put("/:id/quantity", async (req, res) => {
+  const { quantity } = req.body;
+  if (quantity === undefined || quantity < 0) {
+    return res.status(400).json({ error: "Valid quantity is required" });
+  }
+  await db.query("UPDATE film_types SET quantity = ? WHERE id = ?", [quantity, req.params.id]);
+  res.status(200).end();
 });
 
 router.delete("/:id", async (req, res) => {

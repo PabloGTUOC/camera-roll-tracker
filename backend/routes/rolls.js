@@ -32,6 +32,11 @@ router.post("/", async (req, res) => {
     [camera_id, film_type_id, load_date]
   );
 
+  await db.query(
+    "UPDATE film_types SET quantity = GREATEST(0, quantity - 1) WHERE id = ?",
+    [film_type_id]
+  );
+
   res.status(201).end();
 });
 

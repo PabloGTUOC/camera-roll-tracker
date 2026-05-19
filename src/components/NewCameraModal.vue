@@ -34,7 +34,7 @@ const submit = () => {
           <select v-model="supportedFilmType">
             <option value="" disabled>Select format</option>
             <option value="35mm">35mm</option>
-            <option value="120">120</option>
+            <option value="120mm">120mm</option>
           </select>
         </label>
         <button class="submit-btn" type="submit" :disabled="!model || !supportedFilmType">Save camera</button>

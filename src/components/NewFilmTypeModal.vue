@@ -3,21 +3,29 @@ import { ref } from 'vue'
 
 const emit = defineEmits<{
   close: []
-  create: [payload: { name: string; iso: number; format: string; expiration_date: string }]
+  create: [payload: { name: string; iso: number; format: string; expiration_date: string; quantity: number }]
 }>()
 
 const name = ref('')
 const iso = ref<number | null>(null)
 const format = ref('')
 const expirationDate = ref('')
+const quantity = ref<number>(0)
 
 const submit = () => {
   if (!name.value || !iso.value || !format.value || !expirationDate.value) return
-  emit('create', { name: name.value, iso: Number(iso.value), format: format.value, expiration_date: expirationDate.value })
+  emit('create', {
+    name: name.value,
+    iso: Number(iso.value),
+    format: format.value,
+    expiration_date: expirationDate.value,
+    quantity: Number(quantity.value || 0)
+  })
   name.value = ''
   iso.value = null
   format.value = ''
   expirationDate.value = ''
+  quantity.value = 0
 }
 </script>
 
@@ -42,12 +50,16 @@ const submit = () => {
           <select v-model="format">
             <option value="" disabled>Select format</option>
             <option value="35mm">35mm</option>
-            <option value="120">120</option>
+            <option value="120mm">120mm</option>
           </select>
         </label>
         <label class="field-label">
           Expiration date
           <input v-model="expirationDate" type="date" />
+        </label>
+        <label class="field-label">
+          Quantity (rolls in stock)
+          <input v-model.number="quantity" type="number" min="0" placeholder="0" />
         </label>
         <button class="submit-btn" type="submit" :disabled="!name || !iso || !format || !expirationDate">
           Save film type
