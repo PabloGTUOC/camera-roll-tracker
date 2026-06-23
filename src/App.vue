@@ -18,6 +18,7 @@ type DevelopmentRoll = {
   id: number; camera_id: number; film_type_id: number; model: string; film_name: string
   iso: number; format: string; load_date: string; end_date: string
   lab_name: string | null; sent_to_lab_date: string | null; scanned_at: string | null
+  uploaded_to_nas: number
 }
 type HistoryRoll = DevelopmentRoll & { scanned_at: string }
 type Tab = 'cameras' | 'inventory' | 'development' | 'history'
@@ -223,6 +224,11 @@ const sendToLab = async (payload: { id: number; lab_name: string; sent_to_lab_da
 
 const markScanned = async (payload: { id: number; scanned_at: string }) => {
   try { await put(`/rolls/${payload.id}/mark-scanned`, { scanned_at: payload.scanned_at }); await refreshData() }
+  catch (err) { handleError((err as Error).message) }
+}
+
+const updateNasBackup = async (payload: { id: number; uploaded_to_nas: boolean }) => {
+  try { await put(`/rolls/${payload.id}/nas-backup`, { uploaded_to_nas: payload.uploaded_to_nas }); await refreshData() }
   catch (err) { handleError((err as Error).message) }
 }
 
@@ -453,7 +459,7 @@ onMounted(refreshData)
           </div>
         </div>
 
-        <HistoryTable :rolls="filteredHistoryRolls" />
+        <HistoryTable :rolls="filteredHistoryRolls" @update-nas-backup="updateNasBackup" />
       </section>
     </template>
 

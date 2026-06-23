@@ -103,4 +103,17 @@ router.put("/:id/mark-scanned", async (req, res) => {
   res.end();
 });
 
+// Update NAS backup status
+router.put("/:id/nas-backup", async (req, res) => {
+  const { uploaded_to_nas } = req.body;
+  if (uploaded_to_nas === undefined) {
+    return res.status(400).json({ error: "uploaded_to_nas is required" });
+  }
+  await db.query(
+    "UPDATE rolls SET uploaded_to_nas = ? WHERE id = ?",
+    [uploaded_to_nas ? 1 : 0, req.params.id]
+  );
+  res.end();
+});
+
 export default router;
