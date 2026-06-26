@@ -3,7 +3,50 @@ import { db } from "../db.js";
 
 const router = express.Router();
 
-// --- Existing endpoints (unchanged) ---
+router.get("/stats", async (_req, res) => {
+  const [[summary]] = await db.query(`
+    SELECT
+      SUM(CASE WHEN end_date IS NULL THEN 1 ELSE 0 END)                          AS active,
+      SUM(CASE WHEN end_date IS NOT NULL AND scanned_at IS NULL THEN 1 ELSE 0 END) AS in_development,
+      SUM(CASE WHEN scanned_at IS NOT NULL THEN 1 ELSE 0 END)                     AS finished
+    FROM rolls
+  `);
+
+  const [perCamera] = await db.query(`
+    SELECT c.model, COUNT(r.id) AS total
+    FROM cameras c
+    LEFT JOIN rolls r ON r.camera_id = c.id
+    GROUP BY c.id, c.model
+    ORDER BY total DESC
+  `);
+
+  const [perMonth] = await db.query(`
+    SELECT DATE_FORMAT(load_date, '%Y-%m') AS month, COUNT(*) AS count
+    FROM rolls
+    WHERE load_date >= DATE_SUB(CURDATE(), INTERVAL 11 MONTH)
+    GROUP BY month
+    ORDER BY month
+  `);
+
+  const [perFilm] = await db.query(`
+    SELECT f.name, f.format, COUNT(r.id) AS count
+    FROM film_types f
+    LEFT JOIN rolls r ON r.film_type_id = f.id
+    GROUP BY f.id, f.name, f.format
+    HAVING COUNT(r.id) > 0
+    ORDER BY count DESC
+    LIMIT 10
+  `);
+
+  const [formatSplit] = await db.query(`
+    SELECT f.format, COUNT(r.id) AS count
+    FROM rolls r
+    JOIN film_types f ON r.film_type_id = f.id
+    GROUP BY f.format
+  `);
+
+  res.json({ summary, perCamera, perMonth, perFilm, formatSplit });
+});
 
 router.get("/active", async (_req, res) => {
   const [rows] = await db.query(`
@@ -101,6 +144,35 @@ router.put("/:id/mark-scanned", async (req, res) => {
     [scanned_at, req.params.id]
   );
   res.end();
+});
+
+router.delete("/:id", async (req, res) => {
+  const [[roll]] = await db.query(
+    "SELECT id, end_date, scanned_at FROM rolls WHERE id = ?",
+    [req.params.id]
+  );
+  if (!roll) return res.status(404).json({ error: "Roll not found" });
+  if (!roll.end_date) return res.status(400).json({ error: "Use /unload for active rolls" });
+  if (roll.scanned_at) return res.status(400).json({ error: "Cannot delete a roll that is already in history" });
+
+  await db.query("DELETE FROM rolls WHERE id = ?", [req.params.id]);
+  res.status(204).end();
+});
+
+router.delete("/:id/unload", async (req, res) => {
+  const [[roll]] = await db.query(
+    "SELECT id, film_type_id, end_date FROM rolls WHERE id = ?",
+    [req.params.id]
+  );
+  if (!roll) return res.status(404).json({ error: "Roll not found" });
+  if (roll.end_date) return res.status(400).json({ error: "Cannot unload a finished roll" });
+
+  await db.query(
+    "UPDATE film_types SET quantity = quantity + 1 WHERE id = ?",
+    [roll.film_type_id]
+  );
+  await db.query("DELETE FROM rolls WHERE id = ?", [req.params.id]);
+  res.status(204).end();
 });
 
 // Update NAS backup status
